@@ -42,4 +42,3 @@ admin.site.register(Category)
 admin.site.register(Genre)
 admin.site.register(Review)
 admin.site.register(Comment)
-
