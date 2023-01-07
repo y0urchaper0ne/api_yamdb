@@ -37,6 +37,7 @@ class GenreAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-admin.site.register(Title, TitleAdmin)
+admin.site.register(User)
+admin.site.register(Title)
 admin.site.register(Category)
 admin.site.register(Genre)
