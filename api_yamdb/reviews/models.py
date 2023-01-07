@@ -18,37 +18,38 @@ class User(AbstractUser):
     email = models.EmailField(
         max_length=254,
         unique=True,
-    ),
+        null=True,
+    )
     first_name = models.CharField(
         max_length=150,
         blank=True,
         null=True,
-    ),
+    )
     last_name = models.CharField(
         max_length=150,
         blank=True,
         null=True,
-    ),
+    )
     bio = models.TextField(
         'Биография',
         blank=True,
         null=True,
-    ),
+    )
     role = models.CharField(
         max_length=40,
         choices=CHOICES,
         default='user'
-    ),
+    )
     confirmation_code = models.CharField(
         max_length=250,
         blank=True,
         null=True,
-    ),
+    )
     password = models.CharField(
         max_length=250,
         blank=True,
         null=True,
-    ),
+    )
 
     @property
     def is_authenticated(self):
@@ -75,13 +76,13 @@ class Category(models.Model):
     name = models.CharField(
         'Название категории',
         max_length=200,
-    ),
+        null=True,
+    )
     slug = models.SlugField(
         'Адрес категории',
         unique=True,
         db_index=True,
         default=name
-
     )
     
     def __str__(self):
@@ -92,7 +93,8 @@ class Genre(models.Model):
     name = models.CharField(
         'Название жанра',
         max_length=200,
-    ),
+        null=True,
+    )
     slug = models.SlugField(
         'Адрес жанра',
         unique=True,
@@ -108,11 +110,13 @@ class Title(models.Model):
     name = models.CharField(
         'Название произведения',
         max_length=200,
-    ),
+        null=True,
+    )
     year = models.IntegerField(
         'Год выпуска',
-        validators=(year_validator,)
-    ),
+        validators=(year_validator,),
+        null=True,
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
@@ -120,12 +124,12 @@ class Title(models.Model):
         verbose_name='Категория',
         null=True,
         blank=True,
-    ),
+    )
     description = models.TextField(
         'Описание',
         null=True,
         blank=True,
-    ),
+    )
     genre = models.ManyToManyField(
         Genre,
         related_name='genre',

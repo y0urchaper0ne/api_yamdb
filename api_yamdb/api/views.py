@@ -17,9 +17,12 @@ from .permissions import (IsAdmin, IsAdminOrReadOnly,
                           IsAdminModeratorOwnerOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReadOnlyTitleSerializer,
-                          RegisterDataSerializer, ReviewSerializer,
-                          TitleSerializer, TokenSerializer, UserEditSerializer,
-                          UserSerializer, EmailSerializer, ConfirmationCodeSerializer)
+                          ReviewSerializer, TitleSerializer, UserSerializer,
+                          EmailSerializer, ConfirmationCodeSerializer,
+                          UserEditSerializer)
+                          
+                        #   RegisterDataSerializer, TokenSerializer, UserEditSerializer,
+                        #   UserSerializer, EmailSerializer, ConfirmationCodeSerializer)
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
