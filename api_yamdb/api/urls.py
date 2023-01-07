@@ -7,6 +7,7 @@ from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                     send_token
                     )
 
+
 router = DefaultRouter()
 router.register(r'categories', CategoryViewSet)
 router.register(r'genres', GenreViewSet)
