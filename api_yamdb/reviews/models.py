@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+from .validators import year_validator
 
-# class Roles(models.TextChoices):
-#     USER = 'user',
-#     MODERATIOR = 'moderator',
-#     ADMIN = 'admin'
+# USER = 'user',
+# MODERATOR = 'moderator',
+# ADMIN = 'admin'
 
 CHOICES = (
     ('user', 'зарегистрированный пользователь'),
@@ -15,20 +15,57 @@ CHOICES = (
 
 
 class User(AbstractUser):
+    email = models.EmailField(
+        max_length=254,
+        unique=True,
+    ),
+    first_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+    ),
+    last_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+    ),
     bio = models.TextField(
         'Биография',
         blank=True,
         null=True,
     ),
-    email = models.EmailField(
-        max_length=254,
-        unique=True,
-    ),
     role = models.CharField(
-        max_length=16,
+        max_length=40,
         choices=CHOICES,
         default='user'
-    )
+    ),
+    confirmation_code = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+    ),
+    password = models.CharField(
+        max_length=250,
+        blank=True,
+        null=True,
+    ),
+
+    @property
+    def is_authenticated(self):
+        return self.role == 'user'
+
+    @property
+    def is_moderator(self):
+        return self.role == 'moderator'
+    
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+    
+    @property
+    def is_superuser(self):
+        return self.role == 'admin'
+    
 
     def __str__(self):
         return f'username: {self.username}, email: {self.email}'
@@ -74,6 +111,7 @@ class Title(models.Model):
     ),
     year = models.IntegerField(
         'Год выпуска',
+        validators=(year_validator,)
     ),
     category = models.ForeignKey(
         Category,
