@@ -20,16 +20,6 @@ class User(AbstractUser):
         unique=True,
         null=True,
     )
-    first_name = models.CharField(
-        max_length=150,
-        blank=True,
-        null=True,
-    )
-    last_name = models.CharField(
-        max_length=150,
-        blank=True,
-        null=True,
-    )
     bio = models.TextField(
         'Биография',
         blank=True,
@@ -40,16 +30,16 @@ class User(AbstractUser):
         choices=CHOICES,
         default='user'
     )
-    confirmation_code = models.CharField(
-        max_length=250,
-        blank=True,
-        null=True,
-    )
-    password = models.CharField(
-        max_length=250,
-        blank=True,
-        null=True,
-    )
+    # confirmation_code = models.CharField(
+    #     max_length=250,
+    #     blank=True,
+    #     null=True,
+    # )
+    # password = models.CharField(
+    #     max_length=250,
+    #     blank=True,
+    #     null=True,
+    # )
 
     @property
     def is_authenticated(self):
@@ -63,13 +53,16 @@ class User(AbstractUser):
     def is_admin(self):
         return self.role == 'admin'
     
-    @property
-    def is_superuser(self):
-        return self.role == 'admin'
+    # @property
+    # def is_superuser(self):
+    #     return self.role == 'admin'
     
 
     def __str__(self):
         return f'username: {self.username}, email: {self.email}'
+    
+    class Meta:
+        ordering = ['id']
 
 
 class Category(models.Model):
