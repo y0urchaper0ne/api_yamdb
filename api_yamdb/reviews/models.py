@@ -30,7 +30,7 @@ class User(AbstractUser):
         null=True,
     )
     role = models.CharField(
-        max_length=40,
+        max_length=50,
         choices=CHOICES,
         default='user'
     )
@@ -39,11 +39,14 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
-    # password = models.CharField(
-    #     max_length=250,
-    #     blank=True,
-    #     null=True,
-    # )
+    password = models.CharField(
+        max_length=254,
+        blank=True,
+        null=True,
+    )
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     @property
     def is_authenticated(self):
@@ -91,6 +94,7 @@ class Category(models.Model):
         db_index=True,
         max_length=50,
     )
+
     
     class Meta:
         verbose_name = 'Катеория'
@@ -111,7 +115,8 @@ class Genre(models.Model):
         db_index=True,
         max_length=50,
     )
-    
+
+
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
@@ -148,6 +153,7 @@ class Title(models.Model):
         related_name='genre',
         verbose_name='жанр',
     )
+
 
     class Meta:
         verbose_name = 'Произведение'
