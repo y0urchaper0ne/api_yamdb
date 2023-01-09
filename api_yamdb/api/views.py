@@ -8,6 +8,7 @@ from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from reviews.models import Category, Genre, Review, Title, User
@@ -19,7 +20,7 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReadOnlyTitleSerializer,
                           ReviewSerializer, TitleSerializer, UserSerializer,
                           EmailSerializer, ConfirmationCodeSerializer,
-                          UserEditSerializer)
+                          UserEditSerializer, SignUpSerializer)
                           
                         #   RegisterDataSerializer, TokenSerializer, UserEditSerializer,
                         #   UserSerializer, EmailSerializer, ConfirmationCodeSerializer)
@@ -63,7 +64,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdmin, IsAuthenticated,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',) 
 
     @action(
         methods=[
@@ -72,7 +75,7 @@ class UserViewSet(viewsets.ModelViewSet):
         ],
         detail=False,
         url_path="me",
-        permission_classes=[permissions.IsAuthenticated],
+        permission_classes=[permissions.IsAuthenticated,],
         serializer_class=UserEditSerializer,
     )
     def users_own_profile(self, request):
@@ -87,9 +90,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+            serializer.save(role=request.user.role)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(serializer.data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -155,3 +158,13 @@ def send_token(request):
         refresh = RefreshToken.for_user(user)
         return Response(f'Ваш токен:{refresh.access_token}')
     return Response('Неправильный confirmation_code или email.')
+
+
+@api_view(['POST'])
+def signup(request):
+    serializer = SignUpSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        send_confirmation_code(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

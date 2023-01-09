@@ -60,7 +60,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['email']
 
     @property
-    def is_authenticated(self):
+    def is_user(self):
         return self.role == 'user'
 
     @property
@@ -194,6 +194,12 @@ class Review(models.Model):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         ordering = ['pub_date']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique_review'
+            ),
+        ]
     
     def __str__(self):
         return self.text

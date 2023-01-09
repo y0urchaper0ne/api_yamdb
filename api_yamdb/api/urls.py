@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                     ReviewViewSet, TitleViewSet, UserViewSet,
                     send_confirmation_code,
-                    send_token
+                    send_token, signup
                     )
 
 router = DefaultRouter()
@@ -19,16 +19,13 @@ router.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
     CommentViewSet, basename='comments')
 
+auth_urls = [
+    path('auth/token/', send_token, name='send_token'),
+    path('auth/signup/', signup, name='send_confirmation_code'),
+    path('auth/code/', send_confirmation_code, name='send_confirmation_code')
+]
+
 urlpatterns = [
     path('v1/', include(router.urls)),
-    path(
-        'v1/auth/signup/',
-        send_confirmation_code,
-        name='send_confirmation_code'
-    ),
-    path(
-        'v1/auth/token/',
-        send_token,
-        name='send_token'
-    ),
+    path('v1/', include(auth_urls))
 ]
