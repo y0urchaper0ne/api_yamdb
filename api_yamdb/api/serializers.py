@@ -7,6 +7,9 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+    role = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = User
@@ -123,6 +126,7 @@ class ConfirmationCodeSerializer(serializers.Serializer):
 
 
 class EmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User

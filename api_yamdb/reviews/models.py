@@ -2,11 +2,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# from django.contrib.auth.tokens import default_token_generator
-# from django.db.models.signals import post_save
-# from django.dispatch import receiver
-
-from .validators import year_validator
+from .validators import year_validator, username_validator
 
 # USER = 'user',
 # MODERATOR = 'moderator',
@@ -20,9 +16,24 @@ CHOICES = (
 
 
 class User(AbstractUser):
+    username = models.CharField(
+        validators=(username_validator,),
+        max_length=150,
+        unique=True,
+    )
     email = models.EmailField(
         max_length=254,
         unique=True,
+    )
+    first_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+    )
+    last_name = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
     )
     bio = models.TextField(
         'Биография',
@@ -59,10 +70,7 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.role == 'admin'
-    
-    # @property
-    # def is_superuser(self):
-    #     return self.role == 'admin'
+
     
     class Meta:
         verbose_name = 'Пользователь'
@@ -71,16 +79,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'username: {self.username}, email: {self.email}'
-
-
-# @receiver(post_save, sender=User)
-# def post_save(sender, instance, created, **kwargs):
-#     if created:
-#         confirmation_code = default_token_generator.make_token(
-#             instance
-#         )
-#         instance.confirmation_code = confirmation_code
-#         instance.save()
 
 
 class Category(models.Model):
