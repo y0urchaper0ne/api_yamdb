@@ -94,7 +94,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAdminModeratorOwnerOrReadOnly]
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get("title_id"))
@@ -109,7 +109,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [IsAdminModeratorOwnerOrReadOnly]
+    permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get("review_id"))
@@ -127,7 +127,7 @@ def send_confirmation_code(request):
         serializer = EmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = request.POST.get('email')
-        user, state = User.objects.get_or_create(email=email)
+        user = User.objects.get_or_create(email=email)
         token = default_token_generator.make_token(user)
         send_mail(
             subject='Confirmation code!',

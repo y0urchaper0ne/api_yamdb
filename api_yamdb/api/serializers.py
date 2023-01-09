@@ -123,8 +123,7 @@ class ConfirmationCodeSerializer(serializers.Serializer):
 
 
 class EmailSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ('confirmation_code')
+        fields = ('email', 'username')
