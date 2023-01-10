@@ -4,10 +4,6 @@ from django.contrib.auth.models import AbstractUser
 
 from .validators import year_validator, username_validator
 
-# USER = 'user',
-# MODERATOR = 'moderator',
-# ADMIN = 'admin'
-
 CHOICES = (
     ('user', 'зарегистрированный пользователь'),
     ('moderator', 'модератор'),
@@ -66,12 +62,11 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'moderator'
-    
+
     @property
     def is_admin(self):
         return self.role == 'admin'
 
-    
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -93,10 +88,9 @@ class Category(models.Model):
         max_length=50,
     )
 
-    
     class Meta:
         verbose_name = 'Катеория'
-        verbose_name_plural = 'Категории' 
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return f'{self.name} {self.slug}'
@@ -113,7 +107,6 @@ class Genre(models.Model):
         db_index=True,
         max_length=50,
     )
-
 
     class Meta:
         verbose_name = 'Жанр'
@@ -151,7 +144,6 @@ class Title(models.Model):
         related_name='genre',
         verbose_name='жанр',
     )
-
 
     class Meta:
         verbose_name = 'Произведение'
@@ -200,7 +192,7 @@ class Review(models.Model):
                 name='unique_review'
             ),
         ]
-    
+
     def __str__(self):
         return self.text
 
@@ -231,6 +223,6 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ['pub_date']
-    
+
     def __str__(self):
         return self.text

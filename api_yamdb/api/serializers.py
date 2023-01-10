@@ -1,15 +1,11 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
-from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # username = serializers.CharField(required=True)
-    # email = serializers.CharField(required=True)
-
 
     class Meta:
         model = User
@@ -29,8 +25,6 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    # username = serializers.CharField(required=True)
-    # email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -133,11 +127,3 @@ class ConfirmationCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
-
-
-class EmailSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-
-    class Meta:
-        model = User
-        fields = ('email', 'username')
