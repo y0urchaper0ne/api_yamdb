@@ -33,22 +33,17 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
+    def update(self, request, *args, **kwargs):
+        if request.method == 'PUT':
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return super().update(request, *args, **kwargs)
+
     @action(
         methods=['GET', 'PATCH', ],
         detail=False,
         url_path="me",
         permission_classes=(IsAuthenticated,),
     )
-    # def users_own_profile(self, request):
-    #     serializer = UserEditSerializer(request.user)
-    #     if request.method == 'PATCH':
-    #         serializer = UserEditSerializer(
-    #             request.user, data=request.data, partial=True
-    #         )
-    #         serializer.is_valid(raise_exception=True)
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
     def users_own_profile(self, request):
         if request.method == 'GET':
             serializer = UserEditSerializer(request.user)
