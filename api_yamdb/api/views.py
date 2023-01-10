@@ -23,9 +23,6 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           ReviewSerializer, TitleSerializer, UserSerializer,
                           EmailSerializer, ConfirmationCodeSerializer,
                           UserEditSerializer, SignUpSerializer)
-                          
-                        #   RegisterDataSerializer, TokenSerializer, UserEditSerializer,
-                        #   UserSerializer, EmailSerializer, ConfirmationCodeSerializer)
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
@@ -64,37 +61,28 @@ class TitleViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
     queryset = User.objects.all()
-    serializer_class = UserEditSerializer
+    serializer_class = UserSerializer
     pagination_class = PageNumberPagination
-    permission_classes = (IsAdmin, IsAuthenticated,)
+    permission_classes = (IsAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',) 
 
     @action(
-        methods=[
-            "GET",
-            "PATCH",
-        ],
+        methods=['GET', 'PATCH'],
         detail=False,
         url_path="me",
-        permission_classes=[permissions.IsAuthenticated,],
-        # serializer_class=UserEditSerializer,
+        permission_classes=(IsAuthenticated,),
     )
     def users_own_profile(self, request):
-        user = request.user
-        if request.method == "GET":
-            serializer = self.get_serializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
-            serializer = self.get_serializer(
-                user,
-                data=request.data,
-                partial=True
+        serializer = UserEditSerializer(request.user)
+        if request.method == 'PATCH':
+            serializer = UserEditSerializer(
+                request.user, data=request.data, partial=True
             )
             serializer.is_valid(raise_exception=True)
-            serializer.save(role=request.user.role)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -131,7 +119,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 @permission_classes([permissions.AllowAny])
 def send_confirmation_code(request):
     if request.method == 'POST':
-        serializer = UserSerializer(data=request.data)
+        serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         username = request.data.get('username')
         email = request.data.get('email')
@@ -143,21 +131,30 @@ def send_confirmation_code(request):
             from_email='ilyanikitin2308@gmail.com',
             recipient_list=[email, ]
         )
-        return Response('Confirmation code отправлен на ваш Email.')
+        return Response(serializer.data, status=status.HTTP_200_OK)
     return Response('Что-то пошло не так.')
 
 
+# Я написал свою вью, тут есть проверка на наличие пользователя в базе
+# но она вызывает TypeError: 'collections.OrderedDict' object is not callable в некоторых тестах
+
 # @api_view(['POST'])
 # @permission_classes([permissions.AllowAny])
-# def send_confirmation_codеe(request):
+# def send_confirmation_codе(request):
 #     username = request.data.get('username')
 #     email = request.data.get('email')
 #     try:
 #         user = User.objects.get(username=username, email=email) 
 #     except ObjectDoesNotExist: 
 #         user = None
-#     if user != None:
-#         send_confirmationdcode(user)
+#     if user:
+#         token = default_token_generator.make_token(user)
+#         send_mail(
+#             subject='Confirmation code!',
+#             message=str(token),
+#             from_email='ilyanikitin2308@gmail.com',
+#             recipient_list=[email, ]
+#         )
 #         message = 'Данный пользователь уже зарегистрирован'
 #         return Response(message, status=status.HTTP_200_OK)
 #     serializer = EmailSerializer(data=request.data)
@@ -165,7 +162,13 @@ def send_confirmation_code(request):
 #         serializer.save()
 #         username = serializer.validated_data('username')
 #         user = get_object_or_404(User,username=username)
-#         send_confirmationdcode(user)
+#         token = default_token_generator.make_token(user)
+#         send_mail(
+#             subject='Confirmation code!',
+#             message=str(token),
+#             from_email='ilyanikitin2308@gmail.com',
+#             recipient_list=[email, ]
+#         )
 #         return Response(serializer.data, status=status.HTTP_200_OK)
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -186,4 +189,4 @@ def send_token(request):
     if token_check is True:
         refresh = RefreshToken.for_user(user)
         return Response(f'Ваш токен:{refresh.access_token}')
-    return Response('Неправильный confirmation_code или email.')
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

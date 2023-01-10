@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     # username = serializers.CharField(required=True)
     # email = serializers.CharField(required=True)
 
+
     class Meta:
         model = User
         fields = (
@@ -28,8 +29,8 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
+    # username = serializers.CharField(required=True)
+    # email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
@@ -125,7 +126,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ConfirmationCodeSerializer(serializers.Serializer):
+class ConfirmationCodeSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
@@ -134,7 +135,7 @@ class ConfirmationCodeSerializer(serializers.Serializer):
         fields = ('username', 'confirmation_code')
 
 
-class EmailSerializer(serializers.Serializer):
+class EmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
 
     class Meta:
