@@ -7,8 +7,8 @@ from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
+    # username = serializers.CharField(required=True)
+    # email = serializers.CharField(required=True)
 
     class Meta:
         model = User

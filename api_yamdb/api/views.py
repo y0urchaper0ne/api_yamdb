@@ -64,7 +64,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserEditSerializer
     pagination_class = PageNumberPagination
     permission_classes = (IsAdmin, IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
@@ -78,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
         detail=False,
         url_path="me",
         permission_classes=[permissions.IsAuthenticated,],
-        serializer_class=UserEditSerializer,
+        # serializer_class=UserEditSerializer,
     )
     def users_own_profile(self, request):
         user = request.user
@@ -125,16 +125,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
-
-
-# @api_view(['POST'])
-# def signup(request):
-#     serializer = UserSerializer(data=request.data)
-#     if serializer.is_valid():
-#         user = serializer.save()
-#         send_confirmation_code(user)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
