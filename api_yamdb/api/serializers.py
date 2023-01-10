@@ -126,12 +126,12 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class ConfirmationCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('email', 'confirmation_code')
+        fields = ('username', 'confirmation_code')
 
 
 class EmailSerializer(serializers.Serializer):

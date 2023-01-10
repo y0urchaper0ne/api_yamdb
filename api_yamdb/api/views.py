@@ -1,10 +1,12 @@
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import filters, permissions, status, viewsets
+from rest_framework.views import APIView
+from django.core.mail import EmailMessage
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -70,8 +72,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=[
-            "get",
-            "patch",
+            "GET",
+            "PATCH",
         ],
         detail=False,
         url_path="me",
@@ -124,47 +126,74 @@ class CommentViewSet(viewsets.ModelViewSet):
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
 
+
+# @api_view(['POST'])
+# def signup(request):
+#     serializer = UserSerializer(data=request.data)
+#     if serializer.is_valid():
+#         user = serializer.save()
+#         send_confirmation_code(user)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def send_confirmation_code(request):
     if request.method == 'POST':
-        serializer = EmailSerializer(data=request.data)
+        serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = request.POST.get('email')
-        user = User.objects.get_or_create(email=email)
+        username = request.data.get('username')
+        email = request.data.get('email')
+        user, created = User.objects.get_or_create(username=username, email=email)
         token = default_token_generator.make_token(user)
         send_mail(
             subject='Confirmation code!',
             message=str(token),
-            from_email='example@mail.ru',
+            from_email='ilyanikitin2308@gmail.com',
             recipient_list=[email, ]
         )
         return Response('Confirmation code отправлен на ваш Email.')
     return Response('Что-то пошло не так.')
 
 
+# @api_view(['POST'])
+# @permission_classes([permissions.AllowAny])
+# def send_confirmation_codеe(request):
+#     username = request.data.get('username')
+#     email = request.data.get('email')
+#     try:
+#         user = User.objects.get(username=username, email=email) 
+#     except ObjectDoesNotExist: 
+#         user = None
+#     if user != None:
+#         send_confirmationdcode(user)
+#         message = 'Данный пользователь уже зарегистрирован'
+#         return Response(message, status=status.HTTP_200_OK)
+#     serializer = EmailSerializer(data=request.data)
+#     if serializer.is_valid(raise_exception=True):
+#         serializer.save()
+#         username = serializer.validated_data('username')
+#         user = get_object_or_404(User,username=username)
+#         send_confirmationdcode(user)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 def send_token(request):
     serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    confirmation_code = request.POST.get('confirmation_code')
-    email = request.POST.get('email')
-    user = get_object_or_404(User, email=email)
+    confirmation_code = request.data.get('confirmation_code')
+    username = request.data.get('username')
+    user = get_object_or_404(User, username=username)
     if confirmation_code is None:
         return Response('Введите confirmation_code')
-    if email is None:
-        return Response('Введите email')
+    if username is None:
+        return Response('Введите username')
     token_check = default_token_generator.check_token(user, confirmation_code)
     if token_check is True:
         refresh = RefreshToken.for_user(user)
         return Response(f'Ваш токен:{refresh.access_token}')
     return Response('Неправильный confirmation_code или email.')
-
-
-@api_view(['POST'])
-def signup(request):
-    serializer = SignUpSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        send_confirmation_code(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
