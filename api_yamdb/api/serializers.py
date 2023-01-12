@@ -24,11 +24,18 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email')
 
+    def validate_username(self, value):
+        username = value.lower()
+        if User.objects.filter(username=username).exists():
+            raise ValidationError('Пользователь с таким'
+                                  ' username уже существует')
+        return value
+
     def validate_email(self, value):
         email = value.lower()
         if User.objects.filter(email=email).exists():
             raise ValidationError('Пользователь с таким'
-                                  'email уже существует')
+                                  ' email уже существует')
         return value
 
 
