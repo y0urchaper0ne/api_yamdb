@@ -14,14 +14,8 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name', 'bio', 'role')
 
 
-class UserEditSerializer(serializers.ModelSerializer):
+class UserEditSerializer(UserSerializer):
     role = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role')
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -29,6 +23,13 @@ class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
+
+    def validate_email(self, value):
+        email = value.lower()
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('Пользователь с таким'
+                                  'email уже существует')
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -42,6 +43,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    class Meta:
+        model = Review
+        fields = '__all__'
+
     def validate(self, data):
         request = self.context['request']
         author = request.user
@@ -52,10 +57,6 @@ class ReviewSerializer(serializers.ModelSerializer):
                 raise ValidationError('Вы не можете добавить более'
                                       'одного отзыва на произведение')
         return data
-
-    class Meta:
-        model = Review
-        fields = '__all__'
 
 
 class CategorySerializer(serializers.ModelSerializer):

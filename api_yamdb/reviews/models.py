@@ -4,6 +4,10 @@ from django.contrib.auth.models import AbstractUser
 
 from .validators import year_validator, username_validator
 
+USER = 'user'
+MODERATOR = 'moderator'
+ADMIN = 'admin'
+
 CHOICES = (
     ('user', 'зарегистрированный пользователь'),
     ('moderator', 'модератор'),
@@ -57,15 +61,15 @@ class User(AbstractUser):
 
     @property
     def is_user(self):
-        return self.role == 'user'
+        return self.role == USER
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator'
+        return self.role == MODERATOR
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == ADMIN
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -89,7 +93,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Катеория'
+        verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
@@ -141,7 +145,7 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='genre',
+        related_name='title_genre',
         verbose_name='жанр',
     )
 

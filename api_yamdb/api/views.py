@@ -131,7 +131,6 @@ def send_confirmation_code(request):
     except ObjectDoesNotExist:
         user = None
     if user:
-        print(user)
         token = default_token_generator.make_token(user)
         send_mail(
             subject='Confirmation code!',
@@ -146,7 +145,7 @@ def send_confirmation_code(request):
         serializer.is_valid(raise_exception=True)
         username = request.data.get('username')
         email = request.data.get('email')
-        user, created = User.objects.get_or_create(
+        user = User.objects.create(
             username=username, email=email)
         token = default_token_generator.make_token(user)
         send_mail(
